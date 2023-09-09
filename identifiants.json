@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ticket-reader-393211",
+  "private_key_id": "3e65a6abd9066fa7dc7e68fd5744051c694e3e3c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDDW3WLm6OpsdOT\nQ5X1waDhr022+MFG/VpUt2ggujcYa38zNWyHpaELWPFS9KUZgTJLvOGqjNS3o8cb\n2UxA4AVt7H+HUi2nTQmBvVdLjdnnSunGX8ZKKnrswo+96K+ZufUFJhQMJSWNRwxM\nvpzlBnoPT1laMClZLVRB4LWRvY+smBEdeQBGnd+DQFCcjmEPXIwfU4oAysVYKLG0\n73efVp0xbEs6j7p7SW0tmOnuxrKTAXfuHW45Pniy0O7KWMnjYsTTc3lB1DxJHvWz\nOpSylWKdOIFkXHWUusJtBPCNiGBllFQ78ICvtrTbj7OtBcgLItaTpdDSItSPVJnk\nmM5smrt9AgMBAAECggEADJXyVeBc5BGwS0msj2zTjrv1Wkc0EHzsWmPcggCX4cC0\nglnmmDtGoPgFyBiPIGcElKuNBaiqtaVdWQEgBVf0EZe4buvk7rqAVSBGek11Dzkc\nztUcbb/HM+9O77xeFR3NWBu9aTuQFpt6rTZkiOlovglt0hPN6NBfoBo4KF+u3L7B\njXaOtK1/F5WqWwLViygXP9JOwqhTLnTFvv5w7mTq4TyhZvwHdj3/Ks2gzbB79IJf\nxqAIM5JhS4bdu4diTWFtJsc327YZbO7gNjcy6PnJFGFwjUzxu2p+V1UGemw2w9um\nFyJJ85wjIUIQe1OwHiF0XTwjnLAK23izFr68x20l4QKBgQD+DELAzR8Ylx9rxPbz\nu08bcFAEL0IqgTuHGE9fk8QCIt2CKU/iWNIXA5zXhh0ztamC3EjI7yF2BhqMaxu5\nQNyXsu7dwYDDqKVhy23s/dYEh+oGGO59Xp/0zmMKo8e7dYO3aMZeWbphhyRmfyRp\n5pvNMISunTUDYkd6Xe9DWnHMDQKBgQDE279oieyoKBk3qlaRO72p7QmHzR9bVyWA\nez75upjifh7mb9Hhb3OaYza8xD1uB4irEWCgQsWYxAF2NIasPe5mwXwR+Jph8DLF\nQ8i/Li6s0xMbPQeUaKiOZAJOEpOnXmkzGvNWZRkSKAOtIvTLLkjwd0eF7/NFcqTI\nAaz6RVkhMQKBgDwzV5YshVPka9Oz5vk2x7Yu1SdIs5sy6JJI1nZFo8sFzAvOEloG\nxjIh7wa7hyv7vmF+JdlHoVxAcgYYU4eAsUVZZ3UxJ3w1+IrGFBR2ykJkmrY7LjiT\nNcBjL+ETkn7/h+jscSVmid4Wki+frVdTCFSFTMu8ARX+MgXzQIFra0/5AoGBAIdw\nsVaZXmurev4jgf/WXH2nCmGWrTZI1RJ6uS9URI/AOj5NPNefuKfGDwj8807afBtG\nj3ZzukOKx36uUOH8kiO8h0JOCtnLSwMRyfJPMenSJ1kcOjTPdPjSsgtJGLGUcUiq\nCDWuxPsK8MyUOlv4clKPnnP2TSfA4sKA9KQURmhhAoGAYJUoibpKT7itr3t39QPk\n+Lx2Nii2lb6qnB20YE+Y/tUQQlGO5SCrE6j8BImZkxj66FT+UoyC7yDOYDdIyyZT\nZMYMgtTfiBGHZAZnvhcbGSy4PYznN9Vv7D4xdaDk6dGxwlfugm+BP1MU9JF0GI6o\n2HqUA5hwCojKEe64NePqia0=\n-----END PRIVATE KEY-----\n",
+  "client_email": "alexis@ticket-reader-393211.iam.gserviceaccount.com",
+  "client_id": "100915173220422506967",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/alexis%40ticket-reader-393211.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
