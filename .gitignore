@@ -2,4 +2,5 @@ gpt_apikey.py
 test.py
 venvmac
 saveticket
-identifiants
+identifiants.json
+
