@@ -1,4 +1,6 @@
 from pathlib import Path
+
+import openai
 import pytesseract
 import cv2
 import re
@@ -87,9 +89,17 @@ class Ticket():
     def gpt_request(self):
         if self.gpt:
             if not self.gpt_ticket_info:
-                # do request
-                gpt_info = '{"date" : "gpt", "libelle" : "gpt", "montant" : "gpt"}'
-                self.gpt_ticket_info = json.loads(gpt_info)
+                self.gpt_response = openai.ChatCompletion.create(
+                            model="gpt-3.5-turbo",
+                            messages=[
+                                {"role": "system", "content": "You are a helpful assistant."},
+                                {"role": "user", "content": "Who won the world series in 2020?"},
+                                {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+                                {"role": "user", "content": "Where was it played?"}
+    ]
+)
+                self.gpt_info = self.gpt_response['choices'][0]['message']['content']
+                self.gpt_ticket_info = json.loads(self.gpt_info)
 
             if not self.date:
                 self.date = self.gpt_ticket_info.get("date", None)
