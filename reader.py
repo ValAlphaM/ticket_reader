@@ -17,6 +17,17 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 class Ticket():
     def __init__(self, ticket_image, file_name, sheet=None, gpt=False) -> None:
+        
+        """
+        Initialize a Ticket object.
+
+        Args:
+            ticket_image (str): Path to the ticket image.
+            file_name (str): Name of the ticket file.
+            sheet (object): Optional sheet object for storing ticket information.
+            gpt (bool): Flag indicating whether to use GPT for information extraction.
+        """
+
         Ticket.system_prompt = """Tu sais lire les tickets de caisse. On te donnera toujours ce qui a été lu sur un ticket de caisse. Ton but sera de récupérer 3 informations sur ce ticket, le montant total, la date de l’achat, et le libellé de l’achat, c’est à dire le magasin dans lequel a été effectué la dépense ou la raison de la dépense (il faut que le libellé soit court mais explicite). Ajoute CB au début du libellé si le paiement a été effectué en carte bancaire. Tu présenteras ta recherche en renvoyant uniquement un dictionnaire de la forme suivante : {"libelle" : "" , "date" : "jj/mm/aaaa", "montant" : "nombre"}
         le montant doit être une chaine de caractère contenant un nombre. De plus, si tu ne trouves pas l’une des 3 valeurs, alors met None."""
         self.ticket_image = ticket_image
@@ -38,12 +49,37 @@ class Ticket():
             self.gpt_request()
     
     def __str__(self) -> str:
+
+        """
+        Return a string representation of the Ticket object.
+
+        Returns:
+            str: String representation of the Ticket object.
+        """
+
         return f"{self.file_name} : {self.date}-{self.libelle}-{self.amount}"
 
     def __repr__(self) -> str:
+
+        """
+        Return a string representation of the Ticket object.
+
+        Returns:
+            str: String representation of the Ticket object.
+        """
+
         return f"{self.file_name} : {self.date}-{self.libelle}-{self.amount}"
     
     def filter_text_recognition(self):
+
+        """
+        Apply text filtration on the output of OCR.
+
+        This method keeps only alphabet characters and digits, removing unwanted characters.
+        """
+
+        # Application d’une filtration sur le texte de sortie de l’OCR permettant d’enlever les caractères qui ne m’intéresse pas
+        # Je ne garde que les caractères de l’alphabet ou les chiffres
         self.filtered_text = ""
         for char in self.text_recognition:
             if char.isalpha():
@@ -55,6 +91,17 @@ class Ticket():
                 self.filtered_text += char
 
     def get_date(self):
+
+        """
+        Extract and set the date from the ticket.
+
+        This method uses a regex pattern to find the date in the OCR text.
+        """
+
+        # Mise en place d’une recherche de la date du ticket
+        # Utilisation d’une règle regex permettant de potentiellement trouver facilement la date
+        # Si on ne la trouve pas, cela sera fait à la main ou à l’aide de GPT3.5
+
         date_pattern = r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})'
         match = re.search(date_pattern, self.text_recognition)
         if match:
@@ -70,8 +117,16 @@ class Ticket():
             self.date = None
 
     def get_amount(self):
-        # si ticket de carte bancaire
-        # trouver le mot clé "montant" et son indice dans la chaine de caractère
+
+        """
+        Extract and set the amount from the ticket.
+
+        This method looks for keywords related to the amount and extracts the relevant information.
+        """
+
+        # Recherche du montant de la transaction dans le ticket, 
+        # Si c’est un ticket de carte bancaire, il y a des mots clés qui permettent de les repérer facilement
+        # Dans le cas où ce n’est pas un ticket classique, on utilisera GPT3.5 pour trouver le montant.
         keyword_amount = "montant"
         keyword_money = "eur"
         if keyword_amount in self.filtered_text:
@@ -83,20 +138,33 @@ class Ticket():
             self.amount = "unable to read amount"
 
     def get_libelle(self):
+
+        """
+        Extract and set the libelle from the ticket.
+
+        This method extracts the libelle from a standard credit card ticket.
+        """
+
+        # Dans le cas où c’est un ticket classique de carte bleue, il est possible de trouver juste après la date, le libelle de la transaction/l-v+@@)
         lines = self.text_recognition.splitlines()
         self.libelle = "CB " + lines[self.date_index + 1].capitalize()
     
     def gpt_request(self):
+
+        """
+        Make a GPT request to extract missing information.
+
+        This method uses GPT3.5 to fill in missing date, libelle, and amount information.
+        """
+
+        # Mise en place de la requête GPT3.5 en fonction de ce que l’analyse de l’OCR nous a permi de trouver
         if self.gpt:
             if not self.gpt_ticket_info:
                 self.gpt_response = openai.ChatCompletion.create(
                             model="gpt-3.5-turbo",
                             messages=[
-                                {"role": "system", "content": "You are a helpful assistant."},
-                                {"role": "user", "content": "Who won the world series in 2020?"},
-                                {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
-                                {"role": "user", "content": "Where was it played?"}
-    ]
+                                {"role": "system", "content": Ticket.system_prompt}
+                            ]
 )
                 self.gpt_info = self.gpt_response['choices'][0]['message']['content']
                 self.gpt_ticket_info = json.loads(self.gpt_info)
@@ -118,10 +186,26 @@ class Ticket():
 
     
     def add_to_sheet(self, line):
+
+        """
+        Add the ticket information to the specified sheet.
+
+        Args:
+            line (int): Line number in the sheet to update.
+        """
+
+        # Ajout du ticket courant dans le sheet sélectionné
         if self.reading_status:
             self.sheet.update(f"A{line}:F{line}", [[self.date, self.libelle, "", self.amount, "", f"=F{line - 1} - D{line}"]], raw=False)
     
     def verify_status(self):
+
+        """
+        Verify the status of the extracted information.
+
+        This method checks if the extracted date, libelle, and amount are valid.
+        """
+
         date_verif = False
         libelle_verif = False
         amount_verif = False
@@ -158,6 +242,17 @@ class Ticket():
     
     @staticmethod   
     def preprocess_image(image_path):
+
+        """
+        Preprocess the ticket image.
+
+        Args:
+            image_path (str): Path to the ticket image.
+
+        Returns:
+            Image: Processed image in the form of a PIL Image.
+        """
+
         # Charger l'image en niveaux de gris
         image = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
 
@@ -169,6 +264,16 @@ class Ticket():
 
 class TicketReader():
     def __init__(self, width, height, ticket_directory) -> None:
+
+        """
+        Initialize a TicketReader object.
+
+        Args:
+            width (int): Width of the Tkinter window.
+            height (int): Height of the Tkinter window.
+            ticket_directory (str): Directory to store ticket images.
+        """
+
         self.root = tk.Tk()
         self.root.title("Ticket Reader")
         self.width = width
@@ -189,6 +294,13 @@ class TicketReader():
         self.add_widgets()
         
     def initialize_sheets_connection(self):
+
+        """
+        Initialize the connection to Google Sheets.
+
+        This method sets up the connection to Google Sheets for storing ticket information.
+        """
+        
         self.scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
         self.identifiants = ServiceAccountCredentials.from_json_keyfile_name("identifiants.json", self.scope)
         self.client = gspread.authorize(self.identifiants)
@@ -198,6 +310,13 @@ class TicketReader():
                        "Relevé Boursorama" : self.compte.worksheet("Relevé Boursorama")}
 
     def add_widgets(self):
+
+        """
+        Add Tkinter widgets to the window.
+
+        This method creates and packs various widgets such as labels, buttons, and entry fields.
+        """
+
         self.title = tk.Label(self.root, 
                          height=2,
                          width=18,
@@ -241,8 +360,14 @@ class TicketReader():
         self.button_upload_ticket.pack(pady=10)
         self.button_gpt_activation.pack(side=tk.BOTTOM, pady=4)
 
-        
     def add_ticket_photos(self):
+
+        """
+        Open a file dialog to add ticket photos to the directory.
+
+        This method allows the user to select and add ticket photos to the specified directory.
+        """
+
         file_paths = filedialog.askopenfilenames(filetypes=[("Images", "*.jpg;*.jpeg;*.png")])
         if file_paths:
             for path in file_paths:
@@ -253,6 +378,13 @@ class TicketReader():
         self.information_ajout.set(value=f"{self.ticket_count} tickets sélectionnés")
     
     def upload_ticket(self):
+
+        """
+        Upload tickets to the selected Google Sheet.
+
+        This method creates Ticket objects, verifies them, and uploads valid tickets to the Google Sheet.
+        """
+
         # Vérification choix de la page
         print("trying to upload tickets")
         if self.selected_sheet.get() in self.sheets.keys():
@@ -291,6 +423,13 @@ class TicketReader():
                 self.label_error.pack()
 
     def create_tickets(self):
+
+        """
+        Create Ticket objects for each file in the ticket directory.
+
+        This method creates Ticket objects for each file in the ticket directory and adds them to the list.
+        """
+
         for file in self.ticket_directory.iterdir():
             if file.is_file():
                 if file.name not in [ticket.file_name for ticket in self.tickets]:
@@ -302,10 +441,24 @@ class TicketReader():
                     self.tickets.append(ticket)
                 
     def destroy_label_error(self, event):
+
+        """
+        Destroy the label error widget.
+
+        This method destroys the label error widget if it exists.
+        """
+
         if self.label_error:
                 self.label_error.destroy()
 
     def create_failing_menu(self):
+
+        """
+        Create a menu for failing tickets.
+
+        This method creates a menu for failing tickets, allowing the user to modify and correct them.
+        """
+
         if not self.failing_menu_created:
             self.failing_menu_title = tk.Label(self.root, text="À modifier", font=("Arial 16"))
             self.frame_ticket_menu = tk.Frame(self.root)
@@ -334,6 +487,13 @@ class TicketReader():
         self.failing_menu_created = True
 
     def on_listbox_select(self, event):
+
+        """
+        Handle the selection of an item in the listbox.
+
+        This method handles the selection of an item in the listbox and opens the corresponding ticket page.
+        """
+
         # Récupérer le ticket sélectionné
         selected_index = self.list_tickets.curselection()
         if selected_index:
@@ -344,17 +504,42 @@ class TicketReader():
                 self.ticket_page_opened = True
 
     def delete_failing_menu(self):
+
+        """
+        Delete the failing menu.
+
+        This method deletes the failing menu if it exists.
+        """
+
         for element in self.failing_menu_element:
             element.destroy()
             element = None
         self.failing_menu_created = False
 
     def get_ticket_by_filename(self, filename):
+
+        """
+        Get a Ticket object based on the filename.
+
+        Args:
+            filename (str): Filename of the ticket.
+
+        Returns:
+            Ticket: Ticket object corresponding to the filename.
+        """
+
         for ticket in self.failing_tickets:
             if ticket.file_name == filename:
                 return ticket
 
     def open_ticket_page(self):
+
+        """
+        Open a separate window for viewing and modifying ticket information.
+
+        This method opens a separate window for viewing and modifying ticket information.
+        """
+
         self.ticket_page = tk.Toplevel(self.root)
         self.ticket_page.resizable(width=False, height=False)
         self.ticket_page.geometry(f"{800}x{800}")
@@ -410,8 +595,14 @@ class TicketReader():
         self.amount_input.pack(pady=10)
         self.button_validate_ticket.pack(pady=50)
 
-    
     def close_ticket_page(self):
+
+        """
+        Close the ticket page window.
+
+        This method closes the ticket page window and updates the ticket information based on user modifications.
+        """
+
         self.ticket_page.destroy()
         self.ticket_page_opened = False
         print("windows close")
@@ -435,6 +626,13 @@ class TicketReader():
                 self.delete_failing_menu()
     
     def gpt_activation(self):
+
+        """
+        Activate or deactivate GPT for failing tickets.
+
+        This method activates or deactivates GPT for failing tickets and updates their information accordingly.
+        """
+
         if self.use_gpt:
             print("chat gpt désactivé")
             self.button_gpt_activation["bg"] = "#e03d31"
@@ -449,6 +647,13 @@ class TicketReader():
             ticket.gpt_request()
     
     def delete_tickets_files(self):
+
+        """
+        Delete all files in the ticket directory.
+
+        This method deletes all files in the ticket directory and resets ticket-related attributes.
+        """
+
         for file in self.ticket_directory.iterdir():
             if file.is_file():
                 file.unlink()
